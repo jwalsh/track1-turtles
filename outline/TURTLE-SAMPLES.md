@@ -677,7 +677,7 @@ If you need to have a lot of repeated code fragments, you might want to look at 
 
 ##### 7.1 What keywords are
 
-Now we are going to look more into the way Clojure stores information. Let's take a look at a turtle's state. **Important:** we will be using a `state` function, not `state` function that you have used before since it's more convenient for what we are trying to do here. 
+Now we are going to look more into the way Clojure stores information. Let's take a look at a turtle's state.
 
 In the REPL type: 
 ```clojure
