@@ -677,11 +677,11 @@ If you need to have a lot of repeated code fragments, you might want to look at 
 
 ##### 7.1 What keywords are
 
-Now we are going to look more into the way Clojure stores information. Let's take a look at a turtle's state. **Important:** we will be using a `turtle-state` function, not `state` function that you have used before since it's more convenient for what we are trying to do here. 
+Now we are going to look more into the way Clojure stores information. Let's take a look at a turtle's state. **Important:** we will be using a `state` function, not `state` function that you have used before since it's more convenient for what we are trying to do here. 
 
 In the REPL type: 
 ```clojure
-clojurebridge-turtle.walk=> (turtle-state :trinity)
+clojurebridge-turtle.walk=> (state :trinity)
 {:x 99.99999403953571, :y 99.99999562886084, :angle 270, :color [106 40 126]}
 ```
 
@@ -695,13 +695,13 @@ Turtle state `{:x 99.99999403953571, :y 99.99999562886084, :angle 270, :color [1
 
 If you are given a hashmap, it is very easy to get an element that is associated with a particular keyword. For instance, to get the angle from the turtle state I just need to write
 ```clojure
-(:angle (turtle-state :trinity))
+(:angle (state :trinity))
 ``` 
 If the `:trinity`'s state is as above, you will get back 270. Try it with the other parts of `:trinity`'s state (her x and y coordinates and her color). Add another turtle, move it, and then use keywords to get parts of its turtle state.
 
 Keep in mind that if you are looking for a keyword in a hashmap that doesn't have it, you get back a special value called `nil`:
 ```clojure
-(:mood (turtle-state :trinity))
+(:mood (state :trinity))
 ``` 
 returns `nil`  (which stands for _nothing_) since `:mood` isn't a part of a turtle's state. This by itself isn't a problem, but if you get `nil` by mistake, and try to use it later on instead of what you expected to get (a number, a name, etc.), you may get a nasty `NullPointerException` error. Be careful with spelling of keywords: if you misspell it, you may get 'nil` as the result, and it would be difficult to find and fix the error.
 
@@ -731,8 +731,8 @@ We will start writing the function definition in `yourcode.clj` file, under the 
    If the turtle's angle is 0 or 180, it doesn't change"
   [name]
 ```
-Now we need to fill in the function body: we want to get the current turtle's angle by `(:angle (turtle-state name))`, and then check if it's greater than 180. 
-That can be done by applying the function `>`: `(> (:angle (turtle-state name)) 180)`. 
+Now we need to fill in the function body: we want to get the current turtle's angle by `(:angle (state name))`, and then check if it's greater than 180. 
+That can be done by applying the function `>`: `(> (:angle (state name)) 180)`. 
 
 Finally, we need a `when` function so that when the angle is indeed greater than 180, we turn the turtle right by 180 degrees. If the angle is 180 or below, the condition for `when` will be false, and nothing will happen. 
 
@@ -743,7 +743,7 @@ Here is the completed function:
    is changed. Otherwise makes the turtle turn 180 degrees. 
    If the turtle's angle is 0 or 180, it doesn't change"
   [name]
-  (when (> (:angle (turtle-state name)) 180)
+  (when (> (:angle (state name)) 180)
     (right name 180)))
 ```
 Try it in the REPL by applying it to different turtles, such as `(point-up :trinity)`. Check their state after the function call. 
@@ -795,7 +795,7 @@ Now if you type `(spiral :trinity 200)`, you will see the same colorful spiral o
 
 Just like a `map`, `filter` can work with a template function. Here is how you perform this task: 
 ```clojure
-(filter #(< (:angle (turtle-state %)) 180) (turtle-names))
+(filter #(< (:angle (state %)) 180) (turtle-names))
 ```
 Let's say there are three turtles on the canvas, and their state is 
 ```clojure
@@ -805,14 +805,14 @@ Let's say there are three turtles on the canvas, and their state is
 ```
 `filter` will pick the first turtle name, which is `:trinity`, and apply the template, so it will calling the function:
 ```clojure
-(< (:angle (turtle-state :trinity)) 180)
+(< (:angle (state :trinity)) 180)
 ```
 `:trinity`'s angle is 90, which is smaller than 180, so the condition is true. Thus `:trinity` will be added to the resulting vector. 
 
 Next it will check the same template condition for `:neo`:
 template, so it will calling the function:
 ```clojure
-(< (:angle (turtle-state :neo)) 180)
+(< (:angle (state :neo)) 180)
 ```
 `:neo`'s angle is 240, which is not smaller than 180, so he doesn't get added to the result - sorry, `:neo`. 
 
@@ -820,20 +820,20 @@ template, so it will calling the function:
 
 As we just figured out, the result is:
 ```clojure
-clojurebridge-turtle.walk=> (filter #(< (:angle (turtle-state %)) 180) (turtle-names))
+clojurebridge-turtle.walk=> (filter #(< (:angle (state %)) 180) (turtle-names))
 (:trinity :oracle)
 ```
 
 If we want to make only such turtles move forward, we can combine `filter` with `map`: 
 ```clojure
-clojurebridge-turtle.walk=> (map #(forward % 20) (filter #(< (:angle (turtle-state %)) 180) (turtle-names)))
+clojurebridge-turtle.walk=> (map #(forward % 20) (filter #(< (:angle (state %)) 180) (turtle-names)))
 ({:trinity {:length 20}} {:oracle {:length 20}})
 ```
 
 This works (we see the right results), but it is very long. Alternatively we can use Clojure's ability to save results into variables, and then use them later. To define a variable, you use `def` (not `defn`, as you would for a function), and you can define them in the REPL or in the file. We will go with the REPL option:
 
 ```clojure
-clojurebridge-turtle.walk=> (def up-facing-turtles (filter #(< (:angle (turtle-state %)) 180) (turtle-names)))
+clojurebridge-turtle.walk=> (def up-facing-turtles (filter #(< (:angle (state %)) 180) (turtle-names)))
 #'clojurebridge-turtle.walk/up-facing-turtles
 clojurebridge-turtle.walk=> (map #(forward % 20) up-facing-turtles)
 ({:trinity {:length 20}} {:oracle {:length 20}})
